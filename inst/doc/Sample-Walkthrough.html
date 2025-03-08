@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>sample-walkthrough</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">sample-walkthrough</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(msdrought)</span></code></pre></div>
+<p>The purpose of the msdrought package is to take the input of a series
+of rainfall data and to extract some key information (such as dates,
+rainfall intensity, duration of a rainfall period, and more) in order to
+characterize the Mid-Summer Drought climatic phenomenon present in
+Central America. This vignette will walk you through the process of
+taking a raster input and extracting a the statistics for the entire
+timeseries of the provided data.</p>
+<p>We will begin by loading in the relevant packages and the raster data
+we plan to use. In order to get this data to function with the msdrought
+package’s functions, we’ll need to extract a single point of spatial
+data in the form of a timeseries. This will be done using the “terra”
+package. The “tidyr” package will be useful for streamlining the code.
+If the data you plan to analyze is in the form of an xtimeseries (xts)
+object, you only need to load the package and proceed to the next
+step.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(terra)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="fu">library</span>(xts)</span></code></pre></div>
+<p>Now begin working with the sample data.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># This loads the data included in the package, but you would attach your own</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;prcp_cropped.tif&quot;</span>, <span class="at">package =</span> <span class="st">&quot;msdrought&quot;</span>) </span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co"># Extract 1 spatial point from the raster data</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>infile <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(data)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>lon <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">86.2621555581</span> <span class="co"># Longitude of the point we&#39;re interested in analyzing</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>lat <span class="ot">&lt;-</span> <span class="fl">13.3816217871</span>  <span class="co"># Latitude of the point we&#39;re interested in analyzing</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>lonLat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">lon =</span> lon, <span class="at">lat =</span> lat)</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co"># Set up precipitation data by extracting the data located at our longitude and lattitude</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>location <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">vect</span>(lonLat, <span class="at">crs =</span> <span class="st">&quot;+proj=longlat +datum=WGS84&quot;</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>precip <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">extract</span>(infile, location, <span class="at">method =</span> <span class="st">&quot;bilinear&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>  <span class="fu">subset</span>(<span class="at">select =</span> <span class="sc">-</span>ID) <span class="sc">%&gt;%</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>  <span class="fu">t</span>()</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>precip[precip <span class="sc">&lt;</span> <span class="dv">0</span>] <span class="ot">&lt;-</span> <span class="dv">0</span> <span class="co"># replace any negative (errant) values with zeroes</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>precipFrame <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(precip)</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co"># Set up dates (time) data which will be used in creating our time series</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>timeFrame <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(terra<span class="sc">::</span><span class="fu">time</span>(infile)) <span class="sc">|&gt;</span> <span class="fu">data.frame</span>()</span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>startDate <span class="ot">&lt;-</span> timeFrame[<span class="dv">1</span>, <span class="dv">1</span>]</span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>endDate <span class="ot">&lt;-</span> timeFrame[<span class="fu">nrow</span>(timeFrame), <span class="dv">1</span>]</span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>datesSequence <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from =</span> startDate, <span class="at">to =</span> endDate, <span class="at">by =</span> <span class="dv">1</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a>timeseriesFrame <span class="ot">&lt;-</span> <span class="fu">cbind</span>(timeFrame, precipFrame)</span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="fu">colnames</span>(timeseriesFrame) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Date&quot;</span>, <span class="st">&quot;Precipitation&quot;</span>)</span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co"># Make the data into an xtimeseries that the package recognizes</span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a>x <span class="ot">&lt;-</span> xts<span class="sc">::</span><span class="fu">xts</span>(timeseriesFrame<span class="sc">$</span>Precipitation, timeseriesFrame<span class="sc">$</span>Date)</span></code></pre></div>
+<p>At this point, we taken a raster of data and extracted from it a
+series of precipitation values and a series of time for a single
+location. This data can now be used with the MSD package and its
+functions. Alternatively, as mentioned above, you could directly load in
+timeseries data. The workflow for that is much simpler than that of
+loading and preparing a raster.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;timeseries&quot;</span>) <span class="co"># This loads the data included in the package, but you would attach your own</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>x <span class="ot">&lt;-</span> timeseries</span></code></pre></div>
+<p>These two processes both end with data in the form of a timeseries
+that the package can interpret and perform calculations on.</p>
+<p>Now, we will calculate the relevant statistics of related to the MSD.
+These statistics include the intensity, duration, firstMaxValue,
+secondMaxValue, and the minimum rainfall points.</p>
+<p>Before we calculate these pieces of data, however, we will need to
+understand the background processes.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Use the msdDates function to extract the key dates related to the window of the MSD</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co"># msdDates = msdDates(x, firstStartDate, firstEndDate, secondStartDate, secondEndDate)</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>keyDatesTS <span class="ot">&lt;-</span> msdrought<span class="sc">::</span><span class="fu">msdDates</span>(<span class="fu">time</span>(x))</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># Note: The windows (between the start and end dates) can be user-defined, but leaving the field blank uses the parameters determined by the founders of this package</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co"># Filter the data using a bartlett noise filter by using the msdFilter function</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co"># msdFilter = msdFilter(x, window)</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>filterTS <span class="ot">&lt;-</span> msdrought<span class="sc">::</span><span class="fu">msdFilter</span>(x, <span class="at">window =</span> <span class="dv">31</span>, <span class="at">quantity =</span> <span class="dv">2</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co"># Note: The founders of this package recommend filtering the data twice, but this is left up to the user to decide</span></span></code></pre></div>
+<p>Now that we have the key dates and a filtered timeseries, it is time
+to calculate the statistics related to the MSD. We will see an output of
+1 value per year of data. Because the timeseries we’ve created from the
+raster is for 2 years of data (1981 and 1982) we will see 2 values of
+each parameter.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Use msdStats and r&#39;s built-in apply function to apply the intensity calculation across the filtered timeseries data</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co"># msdStats = msdStats(x, dates, fcn)</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>durationValues <span class="ot">&lt;-</span> msdrought<span class="sc">::</span><span class="fu">msdStats</span>(filterTS, keyDatesTS, <span class="at">fcn =</span> <span class="st">&quot;duration&quot;</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; Registered S3 method overwritten by &#39;quantmod&#39;:</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt;   method            from</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt;   as.zoo.data.frame zoo</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>intensityValues <span class="ot">&lt;-</span> msdrought<span class="sc">::</span><span class="fu">msdStats</span>(filterTS, keyDatesTS, <span class="at">fcn =</span> <span class="st">&quot;intensity&quot;</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>firstMaxValues <span class="ot">&lt;-</span> msdrought<span class="sc">::</span><span class="fu">msdStats</span>(filterTS, keyDatesTS, <span class="at">fcn =</span> <span class="st">&quot;firstMaxValue&quot;</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>secondMaxValues <span class="ot">&lt;-</span> msdrought<span class="sc">::</span><span class="fu">msdStats</span>(filterTS, keyDatesTS, <span class="at">fcn =</span> <span class="st">&quot;secondMaxValue&quot;</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>minValues <span class="ot">&lt;-</span> msdrought<span class="sc">::</span><span class="fu">msdStats</span>(filterTS, keyDatesTS, <span class="at">fcn =</span> <span class="st">&quot;min&quot;</span>)</span></code></pre></div>
+<p>After completing this step, we will have a numeric list of all the
+statistics values for every year of data.</p>
+<p>These parameters can always be calculated explicitly as shown above,
+however, there are 2 functions within the MSD package that are much more
+comprehensive and use the previously discussed functions to greater use.
+These functions are msdMain and msdGraph.</p>
+<p>msdMain is a function that calculates all of the relevant statistics
+at once and outputs it in a single table.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># msdMain takes the input parameters from their basic form and calculates the relevant statistics</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co"># msdMain = msdMain(x, firstStartDate, firstEndDate, secondStartDate, secondEndDate, window, quantity)</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>allStats <span class="ot">&lt;-</span> msdrought<span class="sc">::</span><span class="fu">msdMain</span>(x)</span></code></pre></div>
+<p>msdGraph is used to plot the timeseries and perform an analysis on
+the calculated data and parameters to determine if a single year in
+question represents a year with a Mid-Summer Drought or not. Below,
+we’ll use 1982 as an example, as there was a Mid-Summer Drought during
+that year.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Use msdGraph to calculate the statistics and analyze them to determine if an MSD was present or not during the course of one year</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co"># msdGraph = msdGraph(x, year, firstStartDate, firstEndDate, secondStartDate, secondEndDate, window, quantity)</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#graph1982 &lt;- msdrought::msdGraph(x, 1982)</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#plot(graph1982)</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>msdrought<span class="sc">::</span><span class="fu">msdGraph</span>(x, <span class="dv">1982</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" width="70%" style="display: block; margin: auto;" /></p>
+<p>And that is all the important information required to understand and
+use the MSD package!</p>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

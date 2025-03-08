@@ -18,10 +18,17 @@ occurrences and recent changes”, HESS, Maurer et al. (2022)
 ## Installation
 
 You can install the msdrought package from
-[CRAN](https://cran.r-project.org/) with:
+[CRAN](https://cran.r-project.org/package=msdrought) with:
 
 ``` r
 install.packages("msdrought")
+```
+
+Or you can install the development version of this package:
+
+``` r
+if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
+remotes::install_github("EdM44/msdrought")
 ```
 
 ## Example
@@ -76,6 +83,7 @@ These are the steps required to create useful MSD data:
 ``` r
 library(msdrought)
 library(xts)
+#> Warning: package 'xts' was built under R version 4.4.2
 #> Loading required package: zoo
 #> 
 #> Attaching package: 'zoo'

@@ -25,8 +25,12 @@
 #----------------------------------------------------------------------------------------------------------------------------------------------
 msdDates <- function(x, peakwindow1 = "05-01", minwindow1 = "06-01", minwindow2 = "08-31", peakwindow2 = "10-31") {
   # Check that data begin on Jan 1
-  if ((format(x[1], "%m-%d") != "01-01")) {
-    stop("current function requires a January 1 start date\n")
+  m <- lubridate::month(as.Date(x[1]))
+  d <- lubridate::day(as.Date(x[1]))
+  # if ((format(as.Date(x[1]), "%m-%d") != "01-01")) {
+  if(m != 1 || d != 1) {
+    message("Current function requires a January 1 start date\n")
+    message("Input series has start date of ", as.Date(x[1]))
   }
   #----------------------------------------------------------------------------------------------------------------------------------------------
   # find indices for all years for key dates

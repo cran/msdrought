@@ -39,6 +39,107 @@ ul.task-list{list-style: none;}
 
 
 
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -239,24 +340,65 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(msdrought)</span></code></pre></div>
 <p>In general, the msdrought Package works best when the data from a
-specific point in a raster is pulled, converted into an xts object, and
-then analyzed. This vignette will show an alternative approach, when an
-entire raster is analyzed for its duration and intensity values, then a
-single specific point and its corresponding data is extracted to a
-vector. The process for both duration and intensity (as well as any
-other given parameter for the msdStats function) is identical.</p>
+specific point are a raster is pulled, converted into an
+<code>xts</code> object, and then analyzed. This vignette will show an
+alternative approach, when an entire raster is analyzed for its duration
+and intensity values, then a single specific point and its corresponding
+data is extracted to a vector. The process for both duration and
+intensity (as well as any other given parameter for the msdStats
+function) is identical.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Load the necessary packages and the included data, for the purpose of demonstration</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">library</span>(terra)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">library</span>(xts)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># This loads the data included in the package, but you would attach your own</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;prcp_cropped.tif&quot;</span>, <span class="at">package =</span> <span class="st">&quot;msdrought&quot;</span>) </span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>infile <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(data)</span></code></pre></div>
 <p>Now we have our raster data loaded in as “infile”. Using the
 terra::app command, we can apply a function to each cell of the data.
 Begin by finding the range of dates for the raster data, as these values
 are needed for the package to understand the statistics. Data processing
 begins by filtering the data using a bartlett noise filter, then apply
 the msdStats function to the data.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Find the key dates related to the MSD</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co"># msdDates = msdDates(x, firstStartDate, firstEndDate, secondStartDate, secondEndDate)</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>formattedDates <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(terra<span class="sc">::</span><span class="fu">time</span>(infile))</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>critDates <span class="ot">&lt;-</span> msdrought<span class="sc">::</span><span class="fu">msdDates</span>(formattedDates)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co"># Use the terra::app function to apply the Bartlett noise filter (msdFilter) to the raster</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co"># msdFilter = msdFilter(x, window)</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>filtered <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(terra<span class="sc">::</span><span class="fu">app</span>(infile, msdFilter, <span class="at">window =</span> <span class="dv">31</span>, <span class="at">quantity =</span> <span class="dv">2</span>))</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>terra<span class="sc">::</span><span class="fu">time</span>(filtered) <span class="ot">&lt;-</span> formattedDates</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co"># Use the terra::app function to apply the Bartlett noise filter (msdFilter) to the raster</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co"># msdStats = msdStats(x, dates, fcn)</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>intensityPlots <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(terra<span class="sc">::</span><span class="fu">app</span>(filtered, msdStats, critDates, <span class="at">fcn =</span> <span class="st">&quot;intensity&quot;</span>))</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>durationPlots <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(terra<span class="sc">::</span><span class="fu">app</span>(filtered, msdStats, critDates, <span class="at">fcn =</span> <span class="st">&quot;duration&quot;</span>))</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co"># Note: suppressWarnings hides irrelevant messages that result from the msdFilter output</span></span></code></pre></div>
 <p>The “intensityPlots” and “durationPlots” rasters contain the
 intensity and duration values for every geographical location for both
 of the years of data contained in the original dataset. Now that we have
 all the intensity and duration values, we will extract a single point’s
 data from the new rasters.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Set up the desired location&#39;s longitude and latitude values</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>lon <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">86.2621555581</span> <span class="co"># Longitude of the spatial point we&#39;re interested in analyzing</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>lat <span class="ot">&lt;-</span> <span class="fl">13.3816217871</span> <span class="co"># Latitude of the spatial point we&#39;re interested in analyzing</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>lonLat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">lon =</span> lon, <span class="at">lat =</span> lat)</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co"># Set up precipitation data by extracting the data located at our longitude and lattitude</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>location <span class="ot">&lt;-</span> <span class="fu">vect</span>(lonLat, <span class="at">crs =</span> <span class="st">&quot;+proj=longlat +datum=WGS84&quot;</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>locationIntensity <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">extract</span>(intensityPlots, location, <span class="at">method =</span> <span class="st">&quot;bilinear&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  <span class="fu">subset</span>(<span class="at">select =</span> <span class="sc">-</span>ID) <span class="sc">|&gt;</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  <span class="fu">t</span>()</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>locationDuration <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">extract</span>(durationPlots, location, <span class="at">method =</span> <span class="st">&quot;bilinear&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>  <span class="fu">subset</span>(<span class="at">select =</span> <span class="sc">-</span>ID) <span class="sc">|&gt;</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>  <span class="fu">t</span>()</span></code></pre></div>
 <p>Now we have converted the “intensityPlots” and “durationPlots”
 rasters to numeric objects called “locationIntensity” and
 “locationDuration”, which represent the intensity and duration values
@@ -268,8 +410,21 @@ combine the two objects together. If we had repeated the process for all
 5 msdStats parameters (“duration”, “intensity”, “firstMaxValue”,
 “secondMaxValue”, or “min”), we could achieve the same output as the
 “Sample-Walkthrough” vignette.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Pull the years from the data, for the purpose of organizing the data</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>allYears <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">time</span>(infile)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>firstYear <span class="ot">&lt;-</span> lubridate<span class="sc">::</span><span class="fu">year</span>(allYears[<span class="dv">1</span>])</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>lastYear <span class="ot">&lt;-</span> lubridate<span class="sc">::</span><span class="fu">year</span>(allYears[<span class="fu">length</span>(allYears)])</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>yearsSeq <span class="ot">&lt;-</span> firstYear<span class="sc">:</span>lastYear</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co"># Combine the years, intensity and duration objects, for ease of comparison</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">years=</span>yearsSeq, </span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>           <span class="at">durationValue=</span>locationDuration[,<span class="dv">1</span>], </span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>           <span class="at">intensityValue=</span>locationIntensity[,<span class="dv">1</span>])</span></code></pre></div>
+<pre><code>##       years durationValue intensityValue
+## lyr.1  1981      75.23293       6.627172
+## lyr.2  1982     125.00258       7.992033</code></pre>
 <p>The output now closely resembles the output format that would be
-achieved if the location was extracted prior to analysis. Pulling the
+achieved if the location were extracted prior to analysis. Pulling the
 remaining stats (“firstMaxValue”, “secondMaxValue”, and “min”) and
 combining those as well would result in an identical result.</p>
 

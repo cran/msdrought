@@ -12,16 +12,15 @@
 #'
 #' @returns SpatRaster or TimeSeries of Yearly data
 #'
-#' @examples
+#' @export
 #'
+#' @examples
 #' data("timeseries")
 #' ts <- timeseries
 #' dates <- zoo::index(ts)
 #' filteredData <- msdrought::msdFilter(ts, window = 31, quantity = 2)
 #' keyDates <- msdDates(dates)
 #' msdrought::msdStats(filteredData, keyDates, fcn = "duration")
-#'
-#' @export
 #'
 #-----------------------------------------------------------------------------------------------------------------------------------------
 msdStats <- function(x, dates, fcn) {
@@ -33,7 +32,7 @@ msdStats <- function(x, dates, fcn) {
     stop("fcn must be one of duration, intensity, firstMaxValue, secondMaxValue, min, mindex")
   }
   #-----------------------------------------------------------------------------------------------------------------------------------------
-  data <- as.numeric(x) # making sure the data is numeric
+  data <- as.numeric(x) # making sure the data are numeric
   peaks <- quantmod::findPeaks(data) - 1 # finding all of the peaks of the data
   valleys <- quantmod::findValleys(data) - 1 # finding all of the valleys of the data
   output <- c(0) # creating a new variable
@@ -72,24 +71,30 @@ msdStats <- function(x, dates, fcn) {
     mindex2 <- which.min(data[valleys[date3 <= valleys & valleys <= date4]])
     mindate2 <- valleys[date3 <= valleys & valleys <= date4][mindex2]
     check1 <- mindate == mindate2 # making sure that the index does overlap
-    if (anyNA(mindate) == TRUE | length(mindate) == 0) { # making sure we have a minimum, otherwise an NA is output #!!ERROR: argument is of length zero
+
+    # making sure we have a minimum, otherwise an NA is output
+    if (anyNA(mindate) == TRUE | length(mindate) == 0) {
       output[years] <- NA
     } else {
-      datespk <- c(peaks[date3 <= peaks & peaks <= date4], mindate) # finding all the peaks between the outer dates
+      # find all the peaks between the outer dates
+      datespk <- c(peaks[date3 <= peaks & peaks <= date4], mindate)
       datespk <- sort(datespk) # sorting them in order with the mindate
       mindex3 <- which.min(data[datespk]) # finding the index of the mindate
-      maxdex1 <- datespk[1:(mindex3 - 1)] # the next few lines find the max before the minimum and after
+      # the next few lines find the max before the minimum and after
+      maxdex1 <- datespk[1:(mindex3 - 1)]
       maxdex2 <- datespk[(mindex3 + 1):length(dates)]
       maxpos1 <- data[maxdex1]
       maxpos2 <- data[maxdex2]
       max1 <- max(maxpos1, na.rm = TRUE)
       max2 <- max(maxpos2, na.rm = TRUE)
-      pos1 <- which.max(maxpos1)
-      pos2 <- which.max(maxpos2)
+      pos1 <- f.which.max(maxpos1)
+      pos2 <- f.which.max(maxpos2)
       index1 <- maxdex1[pos1]
       index2 <- maxdex2[pos2]
-      maxcheck1 <- max(data[date5:mindate], na.rm = TRUE) # making sure that the max is the real between january and mindate
-      maxcheck2 <- max(data[mindate:date6], na.rm = TRUE) # making sure that the max is the real between mindate and december
+      # making sure that the max is the real between january and mindate
+      maxcheck1 <- max(data[date5:mindate], na.rm = TRUE)
+      # making sure that the max is the real between mindate and december
+      maxcheck2 <- max(data[mindate:date6], na.rm = TRUE)
       maxval1 <- max1 == maxcheck1
       maxval2 <- max2 == maxcheck2
       max1 <- max1 * maxval1
@@ -125,5 +130,5 @@ msdStats <- function(x, dates, fcn) {
       }
     }
   } # end of For years loop
-  return(c(output))
+  return(output)
 }

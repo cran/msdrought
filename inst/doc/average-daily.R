@@ -4,16 +4,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-## ----setup--------------------------------------------------------------------
-library(msdrought)
-
-## -----------------------------------------------------------------------------
-library(terra)
-library(tidyr)
-library(lubridate)
-library(stringr)
-library(ggplot2)
-library(xts)
+## ----setup-2b-----------------------------------------------------------------
 data <- system.file("extdata", "prcp_cropped.tif", package = "msdrought") # This loads the data included in the package, but you would attach your own
 infile <- terra::rast(data)
 
@@ -24,49 +15,39 @@ lonLat <- data.frame(lon = lon, lat = lat)
 
 # Set up precipitation data
 location <- terra::vect(lonLat, crs = "+proj=longlat +datum=WGS84")
-precip <- terra::extract(infile, location, method = "bilinear") %>%
-  subset(select = -ID) %>%
+precip <- terra::extract(infile, location, method = "bilinear") |>
+  subset(select = -ID) |>
   t()
 precip[precip < 0] <- 0 # replace any negative (errant) values with zeroes
 precip <- as.vector(precip)
 
-## -----------------------------------------------------------------------------
-# Set up dates (time) data for ONE year (365 days)
-allTimes <- terra::time(infile) %>%
-  as.Date() %>%
-  data.frame()
-timeFrame <- as.Date(c(allTimes[1, 1]:allTimes[365, 1])) %>%
-  data.frame()
-# Make a Dataframe for each year
-chunkLength <- 365
-divYears <- (split(precip, ceiling(seq_along(precip) / chunkLength)))
-divYearsFrame <- data.frame(divYears)
+## ----loaddata-2---------------------------------------------------------------
+# Find the average for each day of year
+day_of_year <- lubridate::yday(terra::time(infile))
+df <- data.frame(doy = day_of_year, precip = precip) |>
+  dplyr::group_by(doy) |>
+  dplyr::summarize(averagePrecip = mean(precip))
 
-averagePrecip <- c()
-for (i in 1:nrow(divYearsFrame)) {
-  daySum <- sum(divYearsFrame[i, ])
-  averagePrecip <- rbind(averagePrecip, daySum)
-}
-nyears <- round(length(precip) / 365)
-averagePrecip <- averagePrecip / nyears # (average over number of years)
+## ----ts-2---------------------------------------------------------------------
+# Assemble the Timeseries, creating a dummy date column for the averaged year
+ddates <- as.Date("1980-12-31") + unique(day_of_year)
+x <- xts::xts(df$averagePrecip, order.by = ddates) 
 
-## -----------------------------------------------------------------------------
-# Assemble the Timeseries
-timeseriesFrame <- cbind(timeFrame, averagePrecip)
-colnames(timeseriesFrame) <- c("Date", "Precipitation")
-x <- xts(timeseriesFrame$Precipitation, timeseriesFrame$Date) # This produces the "xts" screenshot
-
-## -----------------------------------------------------------------------------
+## ----msd-2a-------------------------------------------------------------------
 # Perform MSD calculations with the new xts
 keyDatesTS <- msdrought::msdDates(time(x))
 filterTS <- msdrought::msdFilter(x, window = 31, quantity = 2)
+
+## ----msd-2b-------------------------------------------------------------------
 duration <- msdrought::msdStats(filterTS, keyDatesTS, fcn = "duration")
+
+## ----msd-2c-------------------------------------------------------------------
 intensity <- msdrought::msdStats(filterTS, keyDatesTS, fcn = "intensity")
 firstMaxValue <- msdrought::msdStats(filterTS, keyDatesTS, fcn = "firstMaxValue")
 secondMaxValue <- msdrought::msdStats(filterTS, keyDatesTS, fcn = "secondMaxValue")
 min <- msdrought::msdStats(filterTS, keyDatesTS, fcn = "min")
 allStats <- msdrought::msdMain(x)
-graph1981 <- suppressWarnings(msdrought::msdGraph(x, 1981))
-suppressWarnings(plot(graph1981))
-# Note: suppressWarnings hides irrelevant messages that result from the msdGraph output
+
+## ----fig-2, fig.align="center", fig.width=5, fig.height=5, out.width="70%"----
+suppressWarnings(msdrought::msdGraph(x, 1981))
 

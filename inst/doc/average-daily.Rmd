@@ -14,21 +14,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(msdrought)
-```
-
 The msdrought package is designed to analyze one year of data at a time. For the AGU '23 conference, a graphic was made that showcased the trends of the average rainfall across a set of years. Each day's rainfall data across multiple years were averaged, then analyzed. For example, in a data set with precipitation data from 1981 to 1985, every day of the year (from January 1st to December 31st) had its rainfall data averaged (example: the precipitation values of 1-1-81, 1-1-82, 1-1-83, 1-1-84, and 1-1-85 were averaged), then put into a dummy xts to be analyzed. This vignette shows how that graphic was created.
+
+Packages used in this vignette: `terra`, `lubridate`, `dplyr`, `xts`, and `msdrought`. These should all be installed.
 
 The first step is to extract the relevant data from a SpatRaster.
 
-```{r}
-library(terra)
-library(tidyr)
-library(lubridate)
-library(stringr)
-library(ggplot2)
-library(xts)
+```{r setup-2b}
 data <- system.file("extdata", "prcp_cropped.tif", package = "msdrought") # This loads the data included in the package, but you would attach your own
 infile <- terra::rast(data)
 
@@ -39,8 +31,8 @@ lonLat <- data.frame(lon = lon, lat = lat)
 
 # Set up precipitation data
 location <- terra::vect(lonLat, crs = "+proj=longlat +datum=WGS84")
-precip <- terra::extract(infile, location, method = "bilinear") %>%
-  subset(select = -ID) %>%
+precip <- terra::extract(infile, location, method = "bilinear") |>
+  subset(select = -ID) |>
   t()
 precip[precip < 0] <- 0 # replace any negative (errant) values with zeroes
 precip <- as.vector(precip)
@@ -48,49 +40,46 @@ precip <- as.vector(precip)
 
 Because we will be using the msdGraph function, a year value will need to be provided. We will create a dummy year that will be used for the sake of plotting. This can be any year, but it is easiest to just use the first year in the data set.
 
-```{r}
-# Set up dates (time) data for ONE year (365 days)
-allTimes <- terra::time(infile) %>%
-  as.Date() %>%
-  data.frame()
-timeFrame <- as.Date(c(allTimes[1, 1]:allTimes[365, 1])) %>%
-  data.frame()
-# Make a Dataframe for each year
-chunkLength <- 365
-divYears <- (split(precip, ceiling(seq_along(precip) / chunkLength)))
-divYearsFrame <- data.frame(divYears)
-
-averagePrecip <- c()
-for (i in 1:nrow(divYearsFrame)) {
-  daySum <- sum(divYearsFrame[i, ])
-  averagePrecip <- rbind(averagePrecip, daySum)
-}
-nyears <- round(length(precip) / 365)
-averagePrecip <- averagePrecip / nyears # (average over number of years)
+```{r loaddata-2}
+# Find the average for each day of year
+day_of_year <- lubridate::yday(terra::time(infile))
+df <- data.frame(doy = day_of_year, precip = precip) |>
+  dplyr::group_by(doy) |>
+  dplyr::summarize(averagePrecip = mean(precip))
 ```
 
 Now, an averaged xts object can be created. This will display the data set's average rainfall over the dummy year.
 
-```{r}
-# Assemble the Timeseries
-timeseriesFrame <- cbind(timeFrame, averagePrecip)
-colnames(timeseriesFrame) <- c("Date", "Precipitation")
-x <- xts(timeseriesFrame$Precipitation, timeseriesFrame$Date) # This produces the "xts" screenshot
+```{r ts-2}
+# Assemble the Timeseries, creating a dummy date column for the averaged year
+ddates <- as.Date("1980-12-31") + unique(day_of_year)
+x <- xts::xts(df$averagePrecip, order.by = ddates) 
 ```
 
-Now, perform the MSD calculations and plot the averaged graph!
+Construct key date sequences and filter time series.
 
-```{r}
+```{r msd-2a}
 # Perform MSD calculations with the new xts
 keyDatesTS <- msdrought::msdDates(time(x))
 filterTS <- msdrought::msdFilter(x, window = 31, quantity = 2)
+```
+
+Perform the MSD calculations.
+
+```{r msd-2b}
 duration <- msdrought::msdStats(filterTS, keyDatesTS, fcn = "duration")
+```
+
+```{r msd-2c}
 intensity <- msdrought::msdStats(filterTS, keyDatesTS, fcn = "intensity")
 firstMaxValue <- msdrought::msdStats(filterTS, keyDatesTS, fcn = "firstMaxValue")
 secondMaxValue <- msdrought::msdStats(filterTS, keyDatesTS, fcn = "secondMaxValue")
 min <- msdrought::msdStats(filterTS, keyDatesTS, fcn = "min")
 allStats <- msdrought::msdMain(x)
-graph1981 <- suppressWarnings(msdrought::msdGraph(x, 1981))
-suppressWarnings(plot(graph1981))
-# Note: suppressWarnings hides irrelevant messages that result from the msdGraph output
+```
+
+Create a plot of the MSD pattern for the year.
+
+```{r fig-2, fig.align="center", fig.width=5, fig.height=5, out.width="70%"}
+suppressWarnings(msdrought::msdGraph(x, 1981))
 ```

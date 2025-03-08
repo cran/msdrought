@@ -1,13 +1,13 @@
 ## ----set knitr options, echo = FALSE------------------------------------------
 # set some knitr options
-knitr::opts_chunk$set(echo = FALSE
+knitr::opts_chunk$set(echo = TRUE
                       , message = FALSE
                       , warning = FALSE)
 
-## ----setup--------------------------------------------------------------------
+## ----setup-4a-----------------------------------------------------------------
 library(msdrought)
 
-## -----------------------------------------------------------------------------
+## ----setup-4b-----------------------------------------------------------------
 # Load the necessary packages and the included data, for the purpose of demonstration
 library(terra)
 library(tidyr)
@@ -15,21 +15,24 @@ library(lubridate)
 library(stringr)
 library(ggplot2)
 library(xts)
-data <- system.file("extdata", "prcp_cropped.tif", package = "msdrought") # This loads the data included in the package, but you would attach your own
+
+## ----loaddata-4---------------------------------------------------------------
+# This loads the data included in the package, but you would attach your own
+data <- system.file("extdata", "prcp_cropped.tif", package = "msdrought") 
 infile <- terra::rast(data)
 
-## -----------------------------------------------------------------------------
+## ----dates-4, warning=FALSE---------------------------------------------------
 # Find the key dates related to the MSD
 # msdDates = msdDates(x, firstStartDate, firstEndDate, secondStartDate, secondEndDate)
-allDates <- terra::time(infile)
-formattedDates <- as.Date(allDates)
+formattedDates <- as.Date(terra::time(infile))
 critDates <- msdrought::msdDates(formattedDates)
 
-# Use the terra::app function to apply the bartlett noise filter (msdFilter) to the raster
+# Use the terra::app function to apply the Bartlett noise filter (msdFilter) to the raster
 # msdFilter = msdFilter(x, window)
-filtered <- terra::app(infile, msdFilter, window = 31, quantity = 2)
+filtered <- suppressWarnings(terra::app(infile, msdFilter, window = 31, quantity = 2))
+terra::time(filtered) <- formattedDates
 
-# Use the terra::app function to apply the bartlett noise filter (msdFilter) to the raster
+# Use the terra::app function to apply the Bartlett noise filter (msdFilter) to the raster
 # msdStats = msdStats(x, dates, fcn)
 intensityPlots <- suppressWarnings(terra::app(filtered, msdStats, critDates, fcn = "intensity"))
 durationPlots <- suppressWarnings(terra::app(filtered, msdStats, critDates, fcn = "duration"))
@@ -38,17 +41,17 @@ durationPlots <- suppressWarnings(terra::app(filtered, msdStats, critDates, fcn 
 ## -----------------------------------------------------------------------------
 # Set up the desired location's longitude and latitude values
 lon <- -86.2621555581 # Longitude of the spatial point we're interested in analyzing
-lat <- 13.3816217871 # Lattitude of the spatial point we're interested in analyzing
+lat <- 13.3816217871 # Latitude of the spatial point we're interested in analyzing
 lonLat <- data.frame(lon = lon, lat = lat)
 
 # Set up precipitation data by extracting the data located at our longitude and lattitude
 location <- vect(lonLat, crs = "+proj=longlat +datum=WGS84")
-locationIntensity <- terra::extract(intensityPlots, location, method = "bilinear") %>%
-  subset(select = -ID) %>%
+locationIntensity <- terra::extract(intensityPlots, location, method = "bilinear") |>
+  subset(select = -ID) |>
   t()
 
-locationDuration <- terra::extract(durationPlots, location, method = "bilinear") %>%
-  subset(select = -ID) %>%
+locationDuration <- terra::extract(durationPlots, location, method = "bilinear") |>
+  subset(select = -ID) |>
   t()
 
 ## -----------------------------------------------------------------------------
@@ -59,7 +62,7 @@ lastYear <- lubridate::year(allYears[length(allYears)])
 yearsSeq <- firstYear:lastYear
 
 # Combine the years, intensity and duration objects, for ease of comparison
-combined <- cbind(yearsSeq, locationDuration, locationIntensity) %>%
-  as.data.frame()
-colnames(combined) <- c("years", "durationValue", "intensityValue")
+data.frame(years=yearsSeq, 
+           durationValue=locationDuration[,1], 
+           intensityValue=locationIntensity[,1])
 
